@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>语音询价录入 Demo（语音录入·规格折算）</title>
+<title>现场询价表（语音录入·规格折算）</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231f6fd0'/%3E%3Cpath d='M16 8a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0v-6a3 3 0 0 1 3-3z' fill='%23fff'/%3E%3Cpath d='M10 16a6 6 0 0 0 12 0' stroke='%23fff' stroke-width='1.6' fill='none'/%3E%3Cpath d='M16 22v3' stroke='%23fff' stroke-width='1.6'/%3E%3C/svg%3E">
 <style>
 :root{
@@ -245,7 +245,7 @@ body{padding-bottom:250px}
       <div><label>调查人</label><input id="m-person" placeholder="填写调查人"></div>
       <div><label>调查日期</label><input id="m-date" type="date"></div>
       <div><label>生效日期（选填）</label><input id="m-effective" type="date"></div>
-      <div class="full"><label>询价点位</label><input id="m-point" placeholder="如：超市A / 超市B / 市场A"></div>
+      <div class="full"><label>询价点位</label><input id="m-point" placeholder="如：超市C / 超市A / 市场B"></div>
     </div>
   </div>
 
@@ -253,7 +253,7 @@ body{padding-bottom:250px}
     <summary><span class="howto-arrow">▸</span> 使用说明（点开查看）</summary>
     <div class="howto-body">
     <b>使用说明：</b><br>
-    1. <b>录入：</b>先选好当前询价点位，点底部输入框 → 按键盘麦克风报「品名＋规格＋价格」（如「花生 五块五」），点「录入」或回车即可；话里带点位名（如「超市A 花生 五块五」）会自动切换点位。识别不准可直接点格子手改。<br>
+    1. <b>录入：</b>先选好当前询价点位，点底部输入框 → 按键盘麦克风报「品名＋规格＋价格」（如「花生 五块五」），点「录入」或回车即可；话里带点位名（如「超市C 花生 五块五」）会自动切换点位。识别不准可直接点格子手改。<br>
     2. <b>无货：</b>某店没货点该店金额框右上角「✕」，或语音说「花生 超市A没货」、先点格子再说「没货」；该店灰化、不计入均价，导出显示「×」，再点一下可取消。<br>
     3. <b>规格折算：</b>统一规格＝配送商品名规格（如 230g→230克、5L→5升）。若只找到不同规格的货，填该店实际规格＋金额，系统按「金额÷实际规格×统一规格」自动折算成 元/统一规格；克/公斤/斤、升/毫升自动换算，包/张/片等同单位比较。<br>
     4. <b>查找：</b>列表上方搜索框可搜品名/规格，还能按分类或「只看未填」筛选，滑动时搜索栏吸顶。<br>
@@ -288,7 +288,7 @@ body{padding-bottom:250px}
   <div class="findbar" id="findbar">
     <div class="find-main">
       <div class="find-box">
-        <input id="find-q" type="text" inputmode="search" placeholder="搜品名 / 规格，如 花生、酱油、230克、5升" autocomplete="off" spellcheck="false">
+        <input id="find-q" type="text" inputmode="search" placeholder="搜品名 / 规格，如 花生、示例品牌、230克、5升" autocomplete="off" spellcheck="false">
         <button class="find-x" id="find-x" type="button" title="清空搜索">×</button>
       </div>
       <span class="find-cnt" id="find-cnt">共 298 项</span>
@@ -320,7 +320,7 @@ body{padding-bottom:250px}
       <button class="btn primary" id="voice-submit">录入</button>
     </div>
     <div class="voice-mode"><label><input type="checkbox" id="smart-toggle" checked> 智能匹配：直接报“品名+规格+价格”自动定位录入</label></div>
-    <div class="voice-tip">如“纯牛奶 24瓶 五十三块九”；没货报“花生 超市A没货”；多条用分号隔开，如“花生 五块五；超市C 白砂糖 四块二”</div>
+    <div class="voice-tip">如“示例品牌纯牛奶 24瓶 五十三块九”；没货报“花生 超市A没货”；多条用分号隔开，如“花生 五块五；超市C 白砂糖 四块二”</div>
     <div class="v-last" id="v-last"></div>
   </div>
 </div>
@@ -342,12 +342,12 @@ body{padding-bottom:250px}
 <div class="mask" id="import-mask">
   <div class="dialog">
     <h3>导入品项</h3>
-    <div class="desc">两种方式任选其一：上传 CSV 文件，或把清单直接粘贴到下面文本框。每行一个品项，用英文逗号分隔，格式：<b>品名,规格说明,统一规格,每件默认</b>。后两项可省略，默认统一规格 500克、每件 500克。<br><b>直接粘「洋葱500g」这种带规格的清单也可以</b>，规格会自动拆到规格说明列；一整段用空格分隔的清单也能自动分行。</div>
+    <div class="desc">两种方式任选其一：上传 CSV 文件，或把清单直接粘贴到下面文本框。每行一个品项，用英文逗号分隔，格式：<b>品名,规格说明,统一规格,每件默认</b>。后两项可省略，默认统一规格 500克、每件 500克。<br><b>直接粘「白菜1号500g」这种带规格的清单也可以</b>，规格会自动拆到规格说明列；一整段用空格分隔的清单也能自动分行。</div>
     <label>① 上传 CSV 文件</label>
     <input type="file" id="import-file" accept=".csv,.txt,text/csv,text/plain">
     <label>② 或直接粘贴清单</label>
-    <div class="hint">示例：<br>纯牛奶,250ml×24瓶/箱,1瓶,24瓶<br>花生,500g/袋,500克,500克</div>
-    <textarea id="import-text" placeholder="纯牛奶,250ml×24瓶/箱,1瓶,24瓶&#10;花生,500g/袋,500克,500克&#10;白砂糖,500g/袋,500克,500克"></textarea>
+    <div class="hint">示例：<br>示例品牌纯牛奶,250ml×24瓶/箱,1瓶,24瓶<br>花生,500g/袋,500克,500克</div>
+    <textarea id="import-text" placeholder="示例品牌纯牛奶,250ml×24瓶/箱,1瓶,24瓶&#10;花生,500g/袋,500克,500克&#10;白砂糖,500g/袋,500克,500克"></textarea>
     <div class="mode">
       <label style="font-weight:400;margin:0"><input type="radio" name="imp-mode" value="append" checked> 追加到现有清单</label>
       <label style="font-weight:400;margin:0"><input type="radio" name="imp-mode" value="replace"> 覆盖现有清单</label>
@@ -361,6 +361,8 @@ body{padding-bottom:250px}
 
 <script>
 /* ===================== 点位定义 ===================== */
+/* 8 个点位：超市A/超市B/超市C/超市D（super）+ 公众/关帝庙/永安/市场D（market）。
+   新模板导出只取 4 个市场 + 超市D；旧格式导出取 3 超市 + 3 市场 + 超市D。 */
 const STORES = [
   {key:'kangning',name:'超市A', group:'super'},
   {key:'walmart', name:'超市B', group:'super'},
@@ -466,8 +468,8 @@ function toBase(value, unit, baseUnit){
   return value;
 }
 /* 从品名后缀识别配送商提供的统一规格：
-   某调味汁230g→{val:230,unit:'克'}；油5L→{5,'升'}；板豆腐4.25kg/12片→{4.25,'公斤'}；
-   娃娃菜/包→{1,'包'}；紫菜（半斤装）→{0.5,'斤'}。识别不到返回 null。 */
+   示例品牌黑椒汁230g→{val:230,unit:'克'}；油5L→{5,'升'}；示例豆腐4.25kg/12片→{4.25,'公斤'}；
+   示例菜/包→{1,'包'}；示例紫菜（半斤装）→{0.5,'斤'}。识别不到返回 null。 */
 function specFromName(name){
   const s=String(name==null?'':name);
   const NUM='[0-9]+(?:\.[0-9]+)?|[一二两三四五六七八九十百千万零〇半]';
@@ -484,9 +486,9 @@ function specFromName(name){
     if(val && val>0) cands.push({val:val, unit:m[2], raw:m[0]});
   }
   /* 品名没有数字规格时：
-     「卤料包（10小包）」→ 内含 10 小包，外层按 1 包计价；
-     「娃娃菜/包」→ 以 /单位 结尾，按 1 个该单位计。
-     注意「冰冻鲜肉包」里的「包」是品名的一部分，不能当单位。 */
+     「示例料包（10小包）」→ 内含 10 小包，外层按 1 包计价；
+     「示例菜/包」→ 以 /单位 结尾，按 1 个该单位计。
+     注意「示例鲜肉包」里的「包」是品名的一部分，不能当单位。 */
   if(!cands.length){
     const inner=s.match(/[0-9]+\s*小(包|张|片|个|只|瓶|罐|盒|条|支|桶|件|箱|听|份|把)/);
     if(inner) return {val:1, unit:normUnit(inner[1])};
@@ -496,7 +498,7 @@ function specFromName(name){
   }
   if(!cands.length) return null;
   /* 优先取「容量/重量」作为计价基准（油 5L、汁 230g），其次计件（包/张/片）。
-     就近取倒数第一个重量/容量项；如「板豆腐4.25kg/12片」取 4.25kg。 */
+     就近取倒数第一个重量/容量项；如「示例豆腐4.25kg/12片」取 4.25kg。 */
   const massvol=cands.filter(function(c){
     const u=normUnit(c.unit);
     return WEIGHT[u]!==undefined || VOLUME[u]!==undefined || u==='斤' || u==='两';
@@ -552,7 +554,7 @@ function render(){
       <div class="stores">${storeHtml}</div>
       <div class="result">
         <div class="avgs">
-          <span class="avg-wrap">发改与超市均价 <span class="avg avg-box">—</span></span>
+          <span class="avg-wrap">超市均价 <span class="avg avg-box">—</span></span>
           <span class="avg-wrap">下浮后价格A <span class="avg avg-down">—</span></span>
           <span class="avg-wrap">市场均价B <span class="avg avg-sc">—</span></span>
           <span class="avg-wrap">(A+B)÷2 <span class="avg avg-ab">—</span></span>
@@ -771,7 +773,7 @@ const SPEC_UNIT=/([0-9]+(?:\.[0-9]+)?|[一二两三四五六七八九十百千�
 
 /* 智能语音：报“品名+规格+价格”，自动匹配品项与点位 */
 
-/* 品名归一化：导入时常把规格尾巴混进品名（如 花生500g / 鸡500g500g / 纯牛奶250ml） */
+/* 品名归一化：导入时常把规格尾巴混进品名（示例海鲜500g / 示例禽肉500g×2 / 示例品牌纯牛奶250ml） */
 function pureName(raw){
   return String(raw==null?"":raw)
     .replace(/\s/g,"")
@@ -818,7 +820,7 @@ function smartVoice(text){
     else if(cn.length>=3 && t.indexOf(cn.slice(0,2))===0) score=cn.length*2;
     else{
       let c=0; for(const ch of cn){ if(t.includes(ch)) c++; }
-      /* 品牌词丢了就别猜：覆盖率不足 0.85 一律不兜底，避免只说「纯牛奶」被记到「示例纯牛奶」上 */
+      /* 品牌词丢了就别猜：覆盖率不足 0.85 一律不兜底，避免只说「纯牛奶」被记到「示例品牌纯牛奶」上 */
       if(c>=2 && c/cn.length>=0.85) score=c;
     }
     if(score>best){ best=score; itemIdx=i; }
@@ -984,7 +986,7 @@ function parseValUnit(str, defVal, defUnit){
 document.getElementById('imp-confirm').addEventListener('click',()=>{
   const raw=document.getElementById('import-text').value||'';
   let lines=raw.split(/\r?\n/).map(s=>s.trim()).filter(s=>s);
-  /* 只粘了一整段、用空格分隔的清单（如「洋葱500g 姜母500g 葱500g…」）自动拆成多行 */
+  /* 只粘了一整段、用空格分隔的清单（如「白菜1号500g 土豆1号500g 萝卜1号500g…」）自动拆成多行 */
   if(lines.length===1 && lines[0].indexOf(',')<0 && lines[0].indexOf('\t')<0){
     const toks=lines[0].split(/\s+/).filter(Boolean);
     const withSpec=toks.filter(x=>/[0-9]+(?:\.[0-9]+)?\s*(?:kg|g|ml|l|克|斤|瓶|包|袋)/i.test(x)).length;
@@ -1000,10 +1002,10 @@ document.getElementById('imp-confirm').addEventListener('click',()=>{
     const rawName=name; /* 保留拆分前的品名（含规格后缀），用于自动识别统一规格 */
     if(!name) return;
     let spec=(parts[1]||'').trim();
-    /* 没写逗号时，把「花生500g」「纯牛奶250ml」的规格拆到规格说明列 */
+    /* 没写逗号时，把「示例海鲜500g」「示例品牌纯牛奶250ml」的规格拆到规格说明列 */
     if(parts.length===1){
-      /* 先按重量/容量数字切（板豆腐4.25kg/12片 → 板豆腐 + 4.25kg/12片），
-         再退而按计件数字切（纯牛奶24瓶）；避免「香辣翅根（15个/包）1kg」被切在 15个。 */
+      /* 先按重量/容量数字切（示例豆腐4.25kg/12片 → 板豆腐 + 4.25kg/12片），
+         再退而按计件数字切（示例品牌纯牛奶24瓶）；避免「示例翅根（15个/包）1kg」被切在 15个。 */
       const m2=name.match(/^(.+?)([0-9]+(?:\.[0-9]+)?\s*(?:kg|g|ml|l|克|斤|两|升|毫升).*)$/i)
             || name.match(/^(.+?)([0-9]+(?:\.[0-9]+)?\s*(?:瓶|袋|件|个|包|盒|条|支|桶|罐).*)$/i);
       if(m2){ name=m2[1].replace(/[\/、,，]+$/,''); if(!spec) spec=m2[2]; }
@@ -1016,7 +1018,7 @@ document.getElementById('imp-confirm').addEventListener('click',()=>{
     if(parts[2]){ const pu=parseValUnit(parts[2],500,'克'); baseVal=pu.val; baseUnit=pu.unit; }
     if(parts[3]){ const du=parseValUnit(parts[3],baseVal,baseUnit); defVal=du.val; defUnit=du.unit; }
     /* 未在第3列显式给统一规格时，按配送商品名后缀自动识别（新模板标准）。
-       上面的拆分会把「某调味汁230g」拆成 name/spec，所以要用拆分前的 rawName。 */
+       上面的拆分会把「示例品牌黑椒汁230g」拆成 name/spec，所以要用拆分前的 rawName。 */
     if(!parts[2]){
       const sp=specFromName(rawName);
       if(sp){ baseVal=sp.val; baseUnit=sp.unit; defVal=sp.val; defUnit=sp.unit; }
@@ -1182,18 +1184,42 @@ render();
    导出生效表 —— 按「完整询价表空表.xls」新模板（17 列 A~Q）
    纯前端生成 OOXML .xlsx，零依赖、不联网
    3 个分类工作表：水果，蔬菜等，奶 / 调味料，干货 / 冻品
-   每表 17 列：序号/品名/超市A/超市B/超市C/超市D/发改与超市均价/
-           下浮后价格A（0.94）/配送报价/市场A/市场B/市场C/
-           市场D/市场均价B/(A+B)/2/审批价/备注
+   当前导出列序（17 列 A~Q）：序号/品名/超市A/超市B/超市C/超市D/超市均价/
+           下浮后价格A（0.94）/市场A/市场B/市场C/市场D/市场均价B/
+           (A+B)÷2/配送报价/审批价/备注
+   「配送报价」位于 (A+B)÷2 与审批价之间；审批价 = MIN(配送报价,(A+B)÷2)。
+   （下方 TPL_HEAD / sheet1Body 是 14 列旧 SpreadsheetML 留档代码，不走当前导出。）
    ============================================================ */
+/* 新模板（新建 XLS 工作表.xls）的商品清单与单位，顺序与模板完全一致 */
+/* 按「完整询价表.xls」三表的商品顺序（水果 120 / 调味料 95 / 冻品 83） */
+/* 示例固定顺序（298 项）：果蔬奶 / 调味干货 / 冻品，按页面清单逐行输出 */
 const TPL_NAMES = ('白菜1号500g|土豆1号500g|萝卜1号500g|西红柿1号500g|黄瓜1号500g|茄子1号500g|青椒1号500g|洋葱1号500g|芹菜1号500g|菠菜1号500g|生菜1号500g|苹果1号500g|香蕉1号500g|梨1号500g|西瓜1号500g|葡萄1号500g|纯牛奶1号500g|酸奶1号500g|鸡蛋1号500g|豆腐1号500g|白菜2号500g|土豆2号500g|萝卜2号500g|西红柿2号500g|黄瓜2号500g|茄子2号500g|青椒2号500g|洋葱2号500g|芹菜2号500g|菠菜2号500g|生菜2号500g|苹果2号500g|香蕉2号500g|梨2号500g|西瓜2号500g|葡萄2号500g|纯牛奶2号500g|酸奶2号500g|鸡蛋2号500g|豆腐2号500g|白菜3号500g|土豆3号500g|萝卜3号500g|西红柿3号500g|黄瓜3号500g|茄子3号500g|青椒3号500g|洋葱3号500g|芹菜3号500g|菠菜3号500g|生菜3号500g|苹果3号500g|香蕉3号500g|梨3号500g|西瓜3号500g|葡萄3号500g|纯牛奶3号500g|酸奶3号500g|鸡蛋3号500g|豆腐3号500g|白菜4号500g|土豆4号500g|萝卜4号500g|西红柿4号500g|黄瓜4号500g|茄子4号500g|青椒4号500g|洋葱4号500g|芹菜4号500g|菠菜4号500g|生菜4号500g|苹果4号500g|香蕉4号500g|梨4号500g|西瓜4号500g|葡萄4号500g|纯牛奶4号500g|酸奶4号500g|鸡蛋4号500g|豆腐4号500g|白菜5号500g|土豆5号500g|萝卜5号500g|西红柿5号500g|黄瓜5号500g|茄子5号500g|青椒5号500g|洋葱5号500g|芹菜5号500g|菠菜5号500g|生菜5号500g|苹果5号500g|香蕉5号500g|梨5号500g|西瓜5号500g|葡萄5号500g|纯牛奶5号500g|酸奶5号500g|鸡蛋5号500g|豆腐5号500g|白菜6号500g|土豆6号500g|萝卜6号500g|西红柿6号500g|黄瓜6号500g|茄子6号500g|青椒6号500g|洋葱6号500g|芹菜6号500g|菠菜6号500g|生菜6号500g|苹果6号500g|香蕉6号500g|梨6号500g|西瓜6号500g|葡萄6号500g|纯牛奶6号500g|酸奶6号500g|鸡蛋6号500g|豆腐6号500g|酱油1号500g|陈醋1号500g|食盐1号500g|白砂糖1号500g|味精1号500g|鸡精1号500g|花椒1号500g|八角1号500g|桂皮1号500g|香叶1号500g|豆瓣酱1号500g|蚝油1号500g|料酒1号500g|淀粉1号500g|粉丝1号500g|木耳1号500g|干香菇1号500g|紫菜1号500g|腐竹1号500g|白芝麻1号500g|酱油2号500g|陈醋2号500g|食盐2号500g|白砂糖2号500g|味精2号500g|鸡精2号500g|花椒2号500g|八角2号500g|桂皮2号500g|香叶2号500g|豆瓣酱2号500g|蚝油2号500g|料酒2号500g|淀粉2号500g|粉丝2号500g|木耳2号500g|干香菇2号500g|紫菜2号500g|腐竹2号500g|白芝麻2号500g|酱油3号500g|陈醋3号500g|食盐3号500g|白砂糖3号500g|味精3号500g|鸡精3号500g|花椒3号500g|八角3号500g|桂皮3号500g|香叶3号500g|豆瓣酱3号500g|蚝油3号500g|料酒3号500g|淀粉3号500g|粉丝3号500g|木耳3号500g|干香菇3号500g|紫菜3号500g|腐竹3号500g|白芝麻3号500g|酱油4号500g|陈醋4号500g|食盐4号500g|白砂糖4号500g|味精4号500g|鸡精4号500g|花椒4号500g|八角4号500g|桂皮4号500g|香叶4号500g|豆瓣酱4号500g|蚝油4号500g|料酒4号500g|淀粉4号500g|粉丝4号500g|木耳4号500g|干香菇4号500g|紫菜4号500g|腐竹4号500g|白芝麻4号500g|酱油5号500g|陈醋5号500g|食盐5号500g|白砂糖5号500g|味精5号500g|鸡精5号500g|花椒5号500g|八角5号500g|桂皮5号500g|香叶5号500g|豆瓣酱5号500g|蚝油5号500g|料酒5号500g|淀粉5号500g|粉丝5号500g|水饺1号500g|汤圆1号500g|鱼丸1号500g|牛肉丸1号500g|鸡翅1号500g|鸡腿1号500g|鸡柳1号500g|薯条1号500g|虾滑1号500g|鱼豆腐1号500g|蟹棒1号500g|烧麦1号500g|包子1号500g|馒头1号500g|玉米粒1号500g|青豆粒1号500g|带鱼段1号500g|小黄鱼1号500g|鱿鱼圈1号500g|肉串1号500g|水饺2号500g|汤圆2号500g|鱼丸2号500g|牛肉丸2号500g|鸡翅2号500g|鸡腿2号500g|鸡柳2号500g|薯条2号500g|虾滑2号500g|鱼豆腐2号500g|蟹棒2号500g|烧麦2号500g|包子2号500g|馒头2号500g|玉米粒2号500g|青豆粒2号500g|带鱼段2号500g|小黄鱼2号500g|鱿鱼圈2号500g|肉串2号500g|水饺3号500g|汤圆3号500g|鱼丸3号500g|牛肉丸3号500g|鸡翅3号500g|鸡腿3号500g|鸡柳3号500g|薯条3号500g|虾滑3号500g|鱼豆腐3号500g|蟹棒3号500g|烧麦3号500g|包子3号500g|馒头3号500g|玉米粒3号500g|青豆粒3号500g|带鱼段3号500g|小黄鱼3号500g|鱿鱼圈3号500g|肉串3号500g|水饺4号500g|汤圆4号500g|鱼丸4号500g|牛肉丸4号500g|鸡翅4号500g|鸡腿4号500g|鸡柳4号500g|薯条4号500g|虾滑4号500g|鱼豆腐4号500g|蟹棒4号500g|烧麦4号500g|包子4号500g|馒头4号500g|玉米粒4号500g|青豆粒4号500g|带鱼段4号500g|小黄鱼4号500g|鱿鱼圈4号500g|肉串4号500g|水饺5号500g|汤圆5号500g|鱼丸5号500g').split('|');
+/* 「导出」按 完整询价表空表(1).xls 的 17 列老模板 */
 const TPL_HEAD = ['序号','品名','超市A','超市B','超市C','超市D','超市均价','下浮后价格A（0.94）','配送报价','市场A','市场B','市场C','市场D','市场均价B','(A+B)÷2','审批价','备注'];
 
+/* 三个工作表逐表配置，完全照「完整询价表.xls」：列宽、表头（含两行表头）、行高、标题后缀 */
+const SHEET_CFG=[
+  { name:'水果，蔬菜等，奶', from:0, to:123, headRows:1, headFont:10,
+    caption:'粮油，蔬菜，海鲜，早餐询价表（单位：元）',
+    rowH:[55,40,25],
+    widths:[7.24,26.99,7.99,9.62,8.62,12.04,14.61,16.62,12.12,10.87,11.99,9.98,13.52,12.62,13.22,11.36,18.79,8.99],
+    head:['序号','品名','超市A','超市B','超市C','超市D','超市均价','下浮后价格A（0.94）','市场A','市场B','市场C','市场D','市场均价B','(A+B)÷2','配送报价','审批价','备注'] },
+  { name:'调味料，干货', from:123, to:214, headRows:2, headFont:10,
+    caption:'调味料，干货询价表 （单位：元）',
+    rowH:[48,25,25],
+    widths:[8.99,24.74,9.12,8.43,9.24,8.99,11.87,13.12,11.99,11.49,11.62,9.12,13.49,13.86,10.74,10.24,17.87,8.99],
+    head:['序号','品名','超市A','超市B','超市C','超市D','超市均价','下浮后价\n格A（0.94）','市场A','市场B','市场C','市场D','市场均价B','（A+B）÷2','配送报价','审批价','备注'] },
+  { name:'冻品', from:214, to:9999, headRows:2, headFont:11,
+    caption:'冻品询价表 （单位：元）',
+    rowH:[42,25,33],
+    widths:[5.61,28.49,9.12,9.49,8.87,9.99,13.62,12.12,12.74,14.12,13.24,8.11,13.12,14.99,11.49,9.87,16.87,8.99],
+    head:['序号','品名','超市A','超市B','超市C','超市D','超市均价','下浮后价格A（0.94）','市场A','市场B','市场C','市场D','市场均价B','（A+B）÷2','配送报价','审批价','备注'] }
+];
 /* 导出按模板分为 3 个分类工作表；区间为 TPL_NAMES（与模板顺序完全一致）的索引 */
 const XLS_GROUPS=[
-  {name:'水果，蔬菜等，奶', from:0,   to:120, caption:'粮油，蔬菜，海鲜，早餐询价表（单位：元）'},
-  {name:'调味料，干货',     from:120, to:215, caption:'调味料，干货询价表（单位：元）'},
-  {name:'冻品',             from:215, to:298, caption:'冻品询价表（单位：元）'}
+  {name:'水果，蔬菜等，奶', from:0,   to:120,  caption:'粮油，蔬菜，海鲜，早餐询价表（单位：元）'},
+  {name:'调味料，干货',   from:120, to:215,  caption:'调味料，干货询价表（单位：元）'},
+  {name:'冻品',           from:215, to:9999, caption:'冻品询价表（单位：元）'}
 ];
 /* ===================== 快速查找 / 筛选 =====================
    只隐藏卡片(display:none)，保留 DOM 与 data-idx，云同步 setCell 才能按 idx 定位填值。
@@ -1282,7 +1308,7 @@ function groupTitle(g){
   const md=document.getElementById('m-date').value||'';
   return (md?md+'':'')+g.caption;
 }
-const TPL_WIDTH = [7.2,28.1,9.1,9.6,8.6,9.6,15.2,17.2,13.6,12.1,12.1,12.0,10.0,12.0,11.5,12.0,12.0];
+const TPL_WIDTH = [7.2,27.0,8.0,9.6,8.6,12.0,14.6,16.6,13.2,12.1,10.9,12.0,10.0,13.5,12.6,11.4,18.8];
 
 function xmlEsc(v){
   return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -1325,12 +1351,11 @@ function itemKey(it){
   return normTplKey((it.name||'')+(it.spec||''));
 }
 function buildXlsRows(){
-  /* 新模板存在「同名不同规格」（某黄豆酱2kg / 800ml）和完全重名（新鲜一级鸡蛋500g），
-     必须按「品名+规格」匹配，且每个模板槽位只消费一个品项，避免导出多出重复行。 */
+  /* 以 TPL_NAMES（用户指定顺序的 示例清单）为骨架逐行输出，保证导出顺序固定；
+     清单里有、骨架里没有的品，按其在清单中的位置归到对应分类并追加到该表末尾。 */
   const tplKeys=TPL_NAMES.map(normTplKey);
   const itemKeys=ITEMS.map(itemKey);
-  const usedItem={};
-  const slot={};
+  const usedItem={}, slot={};
   TPL_NAMES.forEach((n,p)=>{
     const tk=tplKeys[p];
     let found=-1;
@@ -1349,16 +1374,25 @@ function buildXlsRows(){
   const rows=[];
   TPL_NAMES.forEach((n,p)=>{
     const idx=slot[p]===undefined?null:slot[p];
-    rows.push({name:n,idx:idx,d:idx===null?null:cardData(idx)});
+    rows.push({
+      name:n, idx:idx, d:idx===null?null:cardData(idx),
+      unit:(idx!==null&&ITEMS[idx])?(ITEMS[idx].baseUnit||''):'',
+      grp:p<123?0:(p<214?1:2)
+    });
   });
   ITEMS.forEach((it,i)=>{
-    if(!itemKey(it)) return;
     if(usedItem[i]) return;
-    rows.push({name:(it.name||'')+(it.spec||''),idx:i,d:cardData(i)});
+    const nm=(it.name||'').trim();
+    if(!nm && !(it.spec||'').trim()) return;
+    if(tplKeys.indexOf(itemKeys[i])>=0) return;
+    if(rows.some(function(r){ return normTplKey(r.name)===itemKeys[i]; })) return;  /* 骨架里已有同名，别重复 */
+    rows.push({
+      name:(it.name||'')+(it.spec||''), idx:i, d:cardData(i),
+      unit:(it.baseUnit||''), grp:i<123?0:(i<214?1:2)
+    });
   });
   return rows;
 }
-
 const BORDER4 = '<Borders>'
   +'<Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>'
   +'<Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>'
@@ -1394,13 +1428,11 @@ const XLS_STYLES = '<Styles>'
   +'</Styles>';
 
 function xlsTitle(){
+  /* 与模板一致：2026年11月24日询价：单位（元） */
   const md=document.getElementById('m-date').value||'';
-  const eff=document.getElementById('m-effective').value||'';
-  if(!md) return '询价生效表';
+  if(!md) return '询价：单位（元）';
   const p=md.split('-');
-  let t=Number(p[0])+'/'+Number(p[1])+'/'+Number(p[2])+'询价';
-  if(eff){ const q=eff.split('-'); t+='，'+Number(q[1])+'月'+Number(q[2])+'号生效'; }
-  return t;
+  return Number(p[0])+'年'+Number(p[1])+'月'+Number(p[2])+'日询价：单位（元）';
 }
 function sheet1Body(rows){
   let x='<Row ss:Height="30"><Cell ss:MergeAcross="13" ss:StyleID="sTitle">'
@@ -1435,7 +1467,7 @@ function sheet1Body(rows){
 function sheet2Body(rows){
   const head=['序号','系统上架品名'];
   STORES.forEach(s=>{ head.push(s.name+'金额(元)',s.name+'实际规格',s.name+'折算单价'); });
-  head.push('发改与超市均价','市场均价B');
+  head.push('超市均价','市场均价B');
   let x='<Row ss:Height="24">'+head.map(h=>cellStr(h,'sHead2')).join('')+'</Row>';
   rows.forEach((row,i)=>{
     const d=row.d;
@@ -1584,6 +1616,8 @@ function cN(ref,v,s){ return '<c r="'+ref+'" s="'+s+'"><v>'+v+'</v></c>'; }
 function cS(ref,v,s){ return '<c r="'+ref+'" s="'+s+'" t="inlineStr"><is><t xml:space="preserve">'+xmlEsc(v)+'</t></is></c>'; }
 function cE(ref,s){ return '<c r="'+ref+'" s="'+s+'"/>'; }
 function cF(ref,f,v,s){ return '<c r="'+ref+'" s="'+s+'"><f>'+f+'</f><v>'+v+'</v></c>'; }
+/* 公式结果为「空字符串」的单元格：需 t="str" + 空 <v>，否则 Excel/WPS 会把 "" 当 0 显示 */
+function cFE(ref,f,s){ return '<c r="'+ref+'" s="'+s+'" t="str"><f>'+f+'</f><v></v></c>'; }
 function cA(ref,v,s){
   if(v==null||v==='') return cE(ref,s);
   if(typeof v==='number'&&isFinite(v)) return cN(ref,v,s);
@@ -1602,7 +1636,9 @@ function stylesXml(){
     '<font><b/><sz val="20"/><name val="宋体"/></font>',
     '<font><b/><sz val="16"/><name val="宋体"/></font>',
     '<font><sz val="14"/><name val="宋体"/></font>',
-    '<font><sz val="12"/><name val="宋体"/></font>'
+    '<font><sz val="12"/><name val="宋体"/></font>',
+    '<font><b/><sz val="14"/><name val="宋体"/></font>',
+    '<font><b/><sz val="14"/><name val="宋体"/></font>'
   ];
   function xf(o){
     const flags=(o.applyNumberFormat?' applyNumberFormat="1"':'')+(o.applyFont?' applyFont="1"':'')
@@ -1619,7 +1655,10 @@ function stylesXml(){
     xf({numFmt:2,font:5,border:1,applyNumberFormat:1,applyFont:1,applyBorder:1,applyAlignment:1,align:'horizontal="center" vertical="bottom"'}),
     xf({font:5,border:1,applyFont:1,applyBorder:1,applyAlignment:1,align:'horizontal="center" vertical="bottom"'}),
     xf({font:1,border:1,applyFont:1,applyBorder:1,applyAlignment:1,align:'horizontal="center" vertical="center"'}),
-    xf({font:0,border:1,applyFont:1,applyBorder:1,applyAlignment:1,align:'horizontal="center" vertical="center"'})
+    xf({font:0,border:1,applyFont:1,applyBorder:1,applyAlignment:1,align:'horizontal="center" vertical="center"'}),
+    xf({font:6,applyFont:1,applyAlignment:1,align:'horizontal="center" vertical="center"'}),          /* 9 */
+    xf({font:6,border:1,applyFont:1,applyBorder:1,applyAlignment:1,align:'horizontal="center" vertical="center" wrapText="1"'}), /* 10 16号表头 */
+    xf({font:7,border:1,applyFont:1,applyBorder:1,applyAlignment:1,align:'horizontal="center" vertical="center" wrapText="1"'})  /* 11 14号表头 */
   ];
   return XML_DECL+'<styleSheet xmlns="'+NS_MAIN+'">'
     +'<fonts count="'+fonts.length+'">'+fonts.join('')+'</fonts>'
@@ -1643,37 +1682,59 @@ function rowVals(d){
     mkt:d?d.mkt:null, ab:d?d.ab:null
   };
 }
-function sheet1Xml(rows,title){
-  const last=rows.length+2;
-  const cols=TPL_WIDTH.map((w,i)=>'<col min="'+(i+1)+'" max="'+(i+1)+'" width="'+w+'" customWidth="1"/>').join('');
-  let d='<row r="1" ht="30" customHeight="1">'+cS('A1',title||xlsTitle(),1)+'</row>';
-  d+='<row r="2" ht="40" customHeight="1">'
-     +TPL_HEAD.map((h,i)=>cS(colName(i+1)+'2',h,2)).join('')+'</row>';
+function sheet1Xml(rows,cfg,offset){
+  offset=offset||0;
+  const hr=cfg.headRows||1;
+  const dataStart=hr===1?3:4;
+  const last=rows.length+dataStart-1;
+  const cols=cfg.widths.map((w,i)=>'<col min="'+(i+1)+'" max="'+(i+1)+'" width="'+w+'" customWidth="1"/>').join('');
+  const r2=function(x){ return Math.round(x*100 + 1e-9)/100; };
+  const nums=function(a){ return a.filter(function(x){ return typeof x==='number' && isFinite(x); }); };
+  const avgOf=function(a){ const n=nums(a); return n.length?r2(n.reduce(function(x,y){return x+y;},0)/n.length):null; };
+  const md=document.getElementById('m-date').value||'';
+  let d='<row r="1" ht="'+(cfg.rowH[0]||30)+'" customHeight="1">'+cS('A1',md+cfg.caption,1)+'</row>';
+  d+='<row r="2" ht="'+(cfg.rowH[1]||40)+'" customHeight="1">'
+     +cfg.head.map((h,i)=>cS(colName(i+1)+'2',h,cfg.headFont)).join('')+'</row>';
+  if(hr===2){
+    /* 两行表头：第 3 行与第 2 行纵向合并 */
+    d+='<row r="3" ht="'+(cfg.rowH[2]||25)+'" customHeight="1">'
+       +cfg.head.map((h,i)=>cE(colName(i+1)+'3',cfg.headFont)).join('')+'</row>';
+  }
   rows.forEach((row,i)=>{
-    const r=i+3, v=rowVals(row.d);
+    const r=dataStart+i, v=rowVals(row.d);
+    /* 缓存值按公式链算：先四舍五入均价，再算下浮，保证和 Excel/WPS 重算结果逐位一致 */
+    const sup=avgOf([v.kn,v.wm,v.yh,v.fg]);
+    const down=sup!=null?r2(sup*0.94):null;
+    const mkt=avgOf([v.gz,v.hz,v.ya,v.fy]);
+    const ab=(down!=null&&mkt!=null)?r2((down+mkt)/2):null;
     let s='<row r="'+r+'" ht="25" customHeight="1">';
-    s+=cN('A'+r,i+1,3)+cS('B'+r,row.name,4);
+    s+=cN('A'+r,offset+i+1,3)+cS('B'+r,row.name,4);
     s+=cA('C'+r,v.kn,5)+cA('D'+r,v.wm,5)+cA('E'+r,v.yh,5)+cA('F'+r,v.fg,5);
-    s+=(v.sup!=null)?cF('G'+r,'ROUND(AVERAGE(C'+r+':F'+r+'),2)',v.sup,5):cE('G'+r,5);
-    s+=(v.down!=null)?cF('H'+r,'ROUND(G'+r+'*0.94,2)',v.down,5):cE('H'+r,5);
-    s+=cE('I'+r,6);                                   /* 配送报价：页面无 */
-    s+=cA('J'+r,v.gz,6);                              /* 市场A */
-    s+=cA('K'+r,v.hz,6);                              /* 市场B */
-    s+=cA('L'+r,v.ya,6);                              /* 市场C */
-    s+=cA('M'+r,v.fy,6);                              /* 市场D */
-    s+=(v.mkt!=null)?cF('N'+r,'ROUND(AVERAGE(J'+r+':M'+r+'),2)',v.mkt,5):cE('N'+r,5);
-    s+=(v.ab!=null)?cF('O'+r,'ROUND(AVERAGE(H'+r+',N'+r+'),2)',v.ab,5):cE('O'+r,5);
-    s+=cE('P'+r,6)+cE('Q'+r,6);                      /* 审批价 / 备注：页面无 */
+    s+=(sup!=null)?cF('G'+r,'ROUND(AVERAGE(C'+r+':F'+r+'),2)',sup,5):cE('G'+r,5);
+    s+=(down!=null)?cF('H'+r,'ROUND(G'+r+'*0.94,2)',down,5):cE('H'+r,5);
+    /* 新列序 I~Q：公众/关帝庙/永安/市场D/市场均价B/(A+B)÷2/配送报价/审批价/备注 */
+    s+=cA('I'+r,v.gz,6)+cA('J'+r,v.hz,6)+cA('K'+r,v.ya,6)+cA('L'+r,v.fy,6);
+    s+=(mkt!=null)?cF('M'+r,'ROUND(AVERAGE(I'+r+':L'+r+'),2)',mkt,5):cE('M'+r,5);
+    s+=(ab!=null)?cF('N'+r,'ROUND(AVERAGE(H'+r+',M'+r+'),2)',ab,5):cE('N'+r,5);
+    s+=cE('O'+r,5);                                   /* 配送报价：页面无，留空供后续手填 */
+    /* 审批价 = MIN(配送报价 O, (A+B)÷2 N)：填了配送报价就自动取两者较低值。
+       两者都空时显示空(IF+COUNT 保护)，避免 Excel 的 MIN 对空单元格返回 0。
+       缓存值按当前数据算：配送报价为空 → 等于 (A+B)÷2。 */
+    const fApprove='IF(COUNT(N'+r+',O'+r+')=0,"",MIN(N'+r+',O'+r+'))';
+    s+=(ab!=null)?cF('P'+r,fApprove,ab,5):cFE('P'+r,fApprove,5);
+    s+=cE('Q'+r,6);                                   /* 备注 */
     s+='</row>';
     d+=s;
   });
+  const merges=['A1:Q1'];
+  if(hr===2){ for(let i=1;i<=17;i++) merges.push(colName(i)+'2:'+colName(i)+'3'); }
   return XML_DECL+'<worksheet xmlns="'+NS_MAIN+'">'
     +'<sheetPr><pageSetUpPr fitToPage="1"/></sheetPr>'
     +'<dimension ref="A1:Q'+last+'"/>'
-    +'<sheetViews><sheetView workbookViewId="0"><pane ySplit="2" topLeftCell="A3" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>'
+    +'<sheetViews><sheetView workbookViewId="0"><pane ySplit="'+dataStart+'" topLeftCell="A'+(dataStart+1)+'" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>'
     +'<sheetFormatPr defaultRowHeight="18"/>'
     +'<cols>'+cols+'</cols><sheetData>'+d+'</sheetData>'
-    +'<mergeCells count="1"><mergeCell ref="A1:Q1"/></mergeCells>'
+    +'<mergeCells count="'+merges.length+'">'+merges.map(m=>'<mergeCell ref="'+m+'"/>').join('')+'</mergeCells>'
     +'<pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/>'
     +'<pageSetup paperSize="9" orientation="landscape" fitToWidth="1" fitToHeight="0"/>'
     +'</worksheet>';
@@ -1681,7 +1742,7 @@ function sheet1Xml(rows,title){
 function sheet2Xml(rows){
   const head=['序号','系统上架品名'];
   STORES.forEach(s=>{ head.push(s.name+'金额(元)',s.name+'实际规格',s.name+'折算单价'); });
-  head.push('发改与超市均价','市场均价B');
+  head.push('超市均价','市场均价B');
   const lastCol=colName(head.length);
   let d='<row r="1" ht="24" customHeight="1">'
        +head.map((h,i)=>cS(colName(i+1)+'1',h,7)).join('')+'</row>';
@@ -1709,10 +1770,13 @@ function sheet2Xml(rows){
 function buildXlsxBytes(){
   const rows=buildXlsRows();
   const CT_WS='application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml';
-  /* 前 2 组按模板固定区间；最后一组吸收可能追加到末尾的未匹配品项 */
-  const ranges=[[0,120],[120,215],[215,rows.length]];
-  const sheetsDesc=XLS_GROUPS.map((g,i)=>'<sheet name="'+xmlEsc(g.name)+'" sheetId="'+(i+1)+'" r:id="rId'+(i+1)+'"/>').join('');
-  const ctSheets=XLS_GROUPS.map((g,i)=>'<Override PartName="/xl/worksheets/sheet'+(i+1)+'.xml" ContentType="'+CT_WS+'"/>').join('');
+  /* 三分类：按页面清单顺序分三张工作表 */
+  /* 模板行按模板顺序，模板外的品按品类并入对应工作表末尾 */
+  const g=[[],[],[]];
+  rows.forEach(function(r){ g[r.grp||0].push(r); });
+  const sheetsDesc=SHEET_CFG.map((g,i)=>'<sheet name="'+xmlEsc(g.name)+'" sheetId="'+(i+1)+'" r:id="rId'+(i+1)+'"/>').join('');
+  const ctSheets=SHEET_CFG.map((g,i)=>'<Override PartName="/xl/worksheets/sheet'+(i+1)+'.xml" ContentType="'+CT_WS+'"/>').join('');
+  const rels=SHEET_CFG.map((g,i)=>'<Relationship Id="rId'+(i+1)+'" Type="'+NS_REL+'/worksheet" Target="worksheets/sheet'+(i+1)+'.xml"/>').join('');
   const parts=[
     ['[Content_Types].xml', XML_DECL
       +'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
@@ -1732,15 +1796,13 @@ function buildXlsxBytes(){
       +'<calcPr calcId="0" fullCalcOnLoad="1"/></workbook>'],
     ['xl/_rels/workbook.xml.rels', XML_DECL
       +'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
-      +'<Relationship Id="rId1" Type="'+NS_REL+'/worksheet" Target="worksheets/sheet1.xml"/>'
-      +'<Relationship Id="rId2" Type="'+NS_REL+'/worksheet" Target="worksheets/sheet2.xml"/>'
-      +'<Relationship Id="rId3" Type="'+NS_REL+'/worksheet" Target="worksheets/sheet3.xml"/>'
-      +'<Relationship Id="rId4" Type="'+NS_REL+'/styles" Target="styles.xml"/>'
+      +rels
+      +'<Relationship Id="rId'+(SHEET_CFG.length+1)+'" Type="'+NS_REL+'/styles" Target="styles.xml"/>'
       +'</Relationships>'],
     ['xl/styles.xml', stylesXml()],
-    ['xl/worksheets/sheet1.xml', sheet1Xml(rows.slice(ranges[0][0],ranges[0][1]), groupTitle(XLS_GROUPS[0]))],
-    ['xl/worksheets/sheet2.xml', sheet1Xml(rows.slice(ranges[1][0],ranges[1][1]), groupTitle(XLS_GROUPS[1]))],
-    ['xl/worksheets/sheet3.xml', sheet1Xml(rows.slice(ranges[2][0],ranges[2][1]), groupTitle(XLS_GROUPS[2]))]
+    ['xl/worksheets/sheet1.xml', sheet1Xml(g[0], SHEET_CFG[0], 0)],
+    ['xl/worksheets/sheet2.xml', sheet1Xml(g[1], SHEET_CFG[1], g[0].length)],
+    ['xl/worksheets/sheet3.xml', sheet1Xml(g[2], SHEET_CFG[2], g[0].length+g[1].length)]
   ];
   return makeZip(parts.map(p=>({name:p[0],data:utf8Bytes(p[1])})));
 }
@@ -1761,14 +1823,51 @@ function exportXlsx(skipDownload){
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   setTimeout(()=>{ try{ URL.revokeObjectURL(url); }catch(e){} },2000);
   const inApp=/MicroMessenger|Weibo|DingTalk|Feishu|Lark|Aweme/i.test(navigator.userAgent);
-  toast('已导出 '+buildXlsRows().length+' 项（.xlsx）'
+  /* 行数里含模板保留的空占位行，所以分开说：有数据的 N 项 / 文件共 M 行 */
+  const allRows=buildXlsRows();
+  const realCnt=allRows.filter(r=>r.idx!==null).length;
+  toast('已导出 '+realCnt+' 项（含模板占位共 '+allRows.length+' 行）'
        +(inApp?'｜若没反应请用系统浏览器打开':'｜手机可直接打开'),true);
   return u8;
 }
 function exportXlsxB64(){ return u8ToB64(buildXlsxBytes()); }
 
-/* 主按钮：导出真 .xlsx */
-document.getElementById('xls-btn').addEventListener('click',()=>exportXlsx(false));
+/* 导出前先确认云端已拉齐：刚打开页面时本机可能只有占位品项，
+   直接导出会缺掉后加的品类，所以先补拉一次全量再生成文件。
+   新旧两个导出按钮共用这段等待逻辑。 */
+async function withSyncedExport(btn, doExport){
+  var api=window.__xunjiaCloud;
+  var st=(api && api.stats) ? api.stats() : null;
+  if(st && !st.syncComplete && api){
+    var oldTxt=btn.textContent;
+    btn.disabled=true; btn.textContent='拉取云端…';
+    toast('正在拉取云端数据，拉齐再导出', false);
+    /* 刚打开时 SDK 还没就绪、或页面自身的轮询正占用，直接调 pull 可能空转；
+       这里改成「边等边催」：每 250ms 看一次状态，每秒催一次拉取，最多等 12 秒。 */
+    var waited=0;
+    for(var w=0; w<48; w++){
+      await new Promise(function(r){ setTimeout(r, 250); });
+      waited+=250;
+      var cur=api.stats();
+      if(cur.syncComplete) break;
+      var up=!!(api.clientReady && api.clientReady());
+      /* 云端压根没连上（离线 / 未配置占位）：等 2 秒还不 up，或 3 秒内一次都没拉成功，就别死等 */
+      if(!up && waited>=2000) break;
+      if(waited>=3000 && !cur.pulls) break;
+      if(up && w%4===3){ try{ await api.pull(); }catch(e){} }
+      btn.textContent='拉取云端… '+cur.items+' 项';
+    }
+    btn.disabled=false; btn.textContent=oldTxt;
+    st=api.stats();
+    if(!st.syncComplete){
+      toast('云端还没拉齐（已到 '+st.items+' 项），导出可能缺项，可稍后重试', false);
+    }
+  }
+  doExport();
+}
+document.getElementById('xls-btn').addEventListener('click', function(){
+  withSyncedExport(this, function(){ exportXlsx(false); });
+});
 
 </script>
 <!-- 单据密码锁屏：房间设了密码且本机未解锁时全屏覆盖，未解锁不能查看和修改 -->
@@ -1777,7 +1876,7 @@ document.getElementById('xls-btn').addEventListener('click',()=>exportXlsx(false
     <div class="lock-ico">🔒</div>
     <h2 id="lock-title">登录后使用</h2>
     <p id="lock-tip">这张询价单需要登录才能查看和修改。</p>
-    <input id="lock-user" type="text" placeholder="账号" value="admin" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false">
+    <input id="lock-user" type="text" placeholder="账号 admin" value="admin" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
     <input id="lock-pass" type="password" placeholder="密码" autocomplete="current-password" enterkeyhint="go">
     <div class="lock-err" id="lock-err"></div>
     <button class="btn primary" id="lock-enter">登录</button>
@@ -1831,11 +1930,12 @@ document.getElementById('xls-btn').addEventListener('click',()=>exportXlsx(false
   var META_IDS = ['m-school','m-person','m-date','m-point','m-effective'];
   var ITEM_FIELDS = ['name','spec','baseVal','baseUnit','defVal','defUnit'];
 
-  var PAGE = 500, MAX_PAGES = 40;   /* 服务端单次查询上限 1000 行，用 500 分页拉齐 */
+  var PAGE = 1000, MAX_PAGES = 20;  /* 服务端单次查询上限 1000 行，按 1000 分页，减少请求次数 */
   var stateEl = document.getElementById('cloud-state');
   var cloud = null, ready = false, sheetCode = '', devId = '';
   var baseCells = {}, queue = {}, lastPull = null, initialized = false;
   var syncComplete = false, fullPullFail = 0;
+  var pollTimer = null, lastAct = Date.now();
   var flushing = false, polling = false, flushTimer = null;
   var pushes = 0, pulls = 0, lastOk = '';
 
@@ -1928,15 +2028,57 @@ document.getElementById('xls-btn').addEventListener('click',()=>exportXlsx(false
       return ('0' + b.toString(16)).slice(-2);
     }).join('');
   }
-  async function sha256(str){
-    if(window.crypto && window.crypto.subtle && window.TextEncoder){
-      var d = await window.crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
-      return hexOf(d);
+  /* 纯 JS SHA-256：不依赖 crypto.subtle / TextEncoder，所有浏览器算出的结果完全一致。
+     旧版在缺少这两个 API 的设备（老浏览器、部分内嵌 WebView）上会退化成另一套
+     weak 散列，导致输对密码也永远校验不过——这正是「部分设备一直报密码不对」的原因。 */
+  function sha256(str){
+    var K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
+           0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
+           0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+           0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
+           0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
+           0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+           0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
+           0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+    var H=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+    var b=[], i, c, s=String(str==null?'':str);
+    for(i=0;i<s.length;i++){
+      c=s.charCodeAt(i);
+      if(c<0x80) b.push(c);
+      else if(c<0x800) b.push(0xc0|(c>>6),0x80|(c&63));
+      else if(c>=0xd800&&c<=0xdbff&&i+1<s.length){
+        var c2=s.charCodeAt(i+1);
+        if(c2>=0xdc00&&c2<=0xdfff){
+          var cp=0x10000+((c-0xd800)<<10)+(c2-0xdc00); i++;
+          b.push(0xf0|(cp>>18),0x80|((cp>>12)&63),0x80|((cp>>6)&63),0x80|(cp&63));
+        } else b.push(0xe0|(c>>12),0x80|((c>>6)&63),0x80|(c&63));
+      } else b.push(0xe0|(c>>12),0x80|((c>>6)&63),0x80|(c&63));
     }
-    /* 极老浏览器兜底：简单散列，只防误操作 */
-    var h = 5381;
-    for(var i = 0; i < str.length; i++){ h = ((h << 5) + h + str.charCodeAt(i)) >>> 0; }
-    return 'weak' + h.toString(16);
+    var bits=b.length*8, hi=Math.floor(bits/0x100000000), lo=bits>>>0;
+    b.push(0x80); while(b.length%64!==56) b.push(0);
+    b.push((hi>>>24)&255,(hi>>>16)&255,(hi>>>8)&255,hi&255,(lo>>>24)&255,(lo>>>16)&255,(lo>>>8)&255,lo&255);
+    var rotr=function(x,n){ return (x>>>n)|(x<<(32-n)); };
+    for(var off=0;off<b.length;off+=64){
+      var w=new Array(64), j;
+      for(j=0;j<16;j++) w[j]=(b[off+4*j]<<24)|(b[off+4*j+1]<<16)|(b[off+4*j+2]<<8)|b[off+4*j+3];
+      for(j=16;j<64;j++){
+        var x=w[j-15], y=w[j-2];
+        var s0=rotr(x,7)^rotr(x,18)^(x>>>3), s1=rotr(y,17)^rotr(y,19)^(y>>>10);
+        w[j]=(w[j-16]+s0+w[j-7]+s1)|0;
+      }
+      var a=H[0],bb=H[1],cc=H[2],d=H[3],e=H[4],f=H[5],g=H[6],h=H[7];
+      for(j=0;j<64;j++){
+        var S1=rotr(e,6)^rotr(e,11)^rotr(e,25), ch=(e&f)^(~e&g);
+        var t1=(h+S1+ch+K[j]+w[j])|0;
+        var S0=rotr(a,2)^rotr(a,13)^rotr(a,22), mj=(a&bb)^(a&cc)^(bb&cc);
+        var t2=(S0+mj)|0;
+        h=g;g=f;f=e;e=(d+t1)|0;d=cc;cc=bb;bb=a;a=(t1+t2)|0;
+      }
+      H[0]=(H[0]+a)|0;H[1]=(H[1]+bb)|0;H[2]=(H[2]+cc)|0;H[3]=(H[3]+d)|0;
+      H[4]=(H[4]+e)|0;H[5]=(H[5]+f)|0;H[6]=(H[6]+g)|0;H[7]=(H[7]+h)|0;
+    }
+    var out=''; for(i=0;i<8;i++){ var v=(H[i]>>>0).toString(16); while(v.length<8) v='0'+v; out+=v; }
+    return out;
   }
   function newSalt(){
     var a = new Uint8Array(8), s = '', i;
@@ -1981,6 +2123,12 @@ document.getElementById('xls-btn').addEventListener('click',()=>exportXlsx(false
     var u = lockUserEl ? lockUserEl.value : '';
     var v = lockPassEl ? lockPassEl.value : '';
     if(!u || !v){ if(lockErrEl) lockErrEl.textContent = '请输入账号和密码'; return; }
+    /* 账号固定 admin：单独提示，别让用户以为是自己密码记错了 */
+    if(String(u).trim().toLowerCase() !== LOGIN_USER){
+      if(lockErrEl) lockErrEl.textContent = '账号请填 admin（不要填手机号或姓名）';
+      if(lockUserEl && lockUserEl.select) lockUserEl.select();
+      return;
+    }
     if(lockEnterEl) lockEnterEl.disabled = true;
     try{
       if(await checkLogin(u, v)){
@@ -1992,7 +2140,7 @@ document.getElementById('xls-btn').addEventListener('click',()=>exportXlsx(false
         toast('登录成功', true);
         poll(false);
       }else{
-        if(lockErrEl) lockErrEl.textContent = '账号或密码不对';
+        if(lockErrEl) lockErrEl.textContent = '密码不对，请确认当前单据密码';
         if(lockPassEl && lockPassEl.select) lockPassEl.select();
       }
     }catch(e){
@@ -2104,7 +2252,11 @@ document.getElementById('xls-btn').addEventListener('click',()=>exportXlsx(false
       else if(b.v !== v) out.push({k:k, v:v, t:t});
     });
     Object.keys(baseCells).forEach(function(k){
-      if(!(k in s) && baseCells[k].v !== '') out.push({k:k, v:'', t:t});
+      if(k in s || baseCells[k].v === '') return;
+      /* 已停用门店（超市A/超市B/超市C）的历史格子不从云端删掉，只是页面不再显示 */
+      var m=k.match(/^(amt|spec)\|(\d+)\|([a-z]+)$/);
+      if(m && !STORES.some(function(st){ return st.key===m[3]; })) return;
+      out.push({k:k, v:'', t:t});
     });
     return out;
   }
@@ -2413,12 +2565,33 @@ document.getElementById('xls-btn').addEventListener('click',()=>exportXlsx(false
     }
     ready = true;
     poll(true);
-    setInterval(function(){
-      poll(false);
-      if(Object.keys(queue).length) flush(false);
-    }, 3000);
+    /* 自适应轮询：刚操作过 10 秒一次，闲置 1 分钟后降到 30 秒一次；
+       页面切到后台 / 手机锁屏时完全停掉，回来后立刻补拉一次。
+       这样既保留「几秒内互见」，又把空闲时的云请求量降一个数量级。 */
+    pollTimer = null;
+    lastAct = Date.now();
+    ['pointerdown','keydown','input','touchstart'].forEach(function(ev){
+      document.addEventListener(ev, function(){ lastAct = Date.now(); }, { passive: true });
+    });
+    function schedulePoll(){
+      if(pollTimer){ clearTimeout(pollTimer); pollTimer = null; }
+      if(document.hidden) return;
+      var idle = Date.now() - lastAct > 60000;
+      var delay = idle ? 30000 : 10000;   /* 操作中 10 秒一次，闲置 1 分钟后 30 秒一次 */
+      pollTimer = setTimeout(function(){
+        pollTimer = null;
+        poll(false);
+        if(Object.keys(queue).length) flush(false);
+        schedulePoll();
+      }, delay);
+    }
+    schedulePoll();
     document.addEventListener('visibilitychange', function(){
-      if(!document.hidden){ poll(false); flush(false); }
+      if(document.hidden){
+        if(pollTimer){ clearTimeout(pollTimer); pollTimer = null; }
+      }else{
+        poll(false); flush(false); schedulePoll();
+      }
     });
     window.addEventListener('online', function(){ poll(false); flush(false); });
   }
