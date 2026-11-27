@@ -361,7 +361,7 @@ body{padding-bottom:250px}
 
 <script>
 /* ===================== 点位定义 ===================== */
-/* 8 个点位：超市A/超市B/超市C/超市D（super）+ 公众/关帝庙/永安/市场D（market）。
+/* 8 个点位：超市A/超市B/超市C/超市D（super）+ 市场A/市场B/市场C/市场D（market）。
    新模板导出只取 4 个市场 + 超市D；旧格式导出取 3 超市 + 3 市场 + 超市D。 */
 const STORES = [
   {key:'kangning',name:'超市A', group:'super'},
@@ -874,7 +874,6 @@ const NO_STOCK_WORDS = /无货|没货|缺货|断货|售罄|卖完|卖光|没有�
 function storeAliases(s){
   const a=[s.name];
   if(/市场$/.test(s.name)) a.push(s.name.replace(/市场$/,''));
-  if(s.key==='fagaiwei') a.push('发改');
   return a;
 }
 function matchStoreInSpeech(t){
@@ -1712,7 +1711,7 @@ function sheet1Xml(rows,cfg,offset){
     s+=cA('C'+r,v.kn,5)+cA('D'+r,v.wm,5)+cA('E'+r,v.yh,5)+cA('F'+r,v.fg,5);
     s+=(sup!=null)?cF('G'+r,'ROUND(AVERAGE(C'+r+':F'+r+'),2)',sup,5):cE('G'+r,5);
     s+=(down!=null)?cF('H'+r,'ROUND(G'+r+'*0.94,2)',down,5):cE('H'+r,5);
-    /* 新列序 I~Q：公众/关帝庙/永安/市场D/市场均价B/(A+B)÷2/配送报价/审批价/备注 */
+    /* 新列序 I~Q：市场A/市场B/市场C/市场D/市场均价B/(A+B)÷2/配送报价/审批价/备注 */
     s+=cA('I'+r,v.gz,6)+cA('J'+r,v.hz,6)+cA('K'+r,v.ya,6)+cA('L'+r,v.fy,6);
     s+=(mkt!=null)?cF('M'+r,'ROUND(AVERAGE(I'+r+':L'+r+'),2)',mkt,5):cE('M'+r,5);
     s+=(ab!=null)?cF('N'+r,'ROUND(AVERAGE(H'+r+',M'+r+'),2)',ab,5):cE('N'+r,5);
@@ -1909,9 +1908,10 @@ document.getElementById('xls-btn').addEventListener('click', function(){
    现场询价表 · 实时共享同步层
    - 云端按「单元格」存：房间(单据码) + 格子键 + 值 + 设备 + 时间戳
    - 本机改动只提交变化的格子，两人写不同格子互不覆盖
-   - 每 3 秒增量拉取，自动把对方的录入显示在页面上（只改变化的输入框）
-   - 首次 / 手动刷新按 cell_key 分页拉齐（服务端单次最多 1000 行），
-     拉齐前不推进增量游标、不显示「已同步」、不回灌本机缺项状态
+   - 自适应增量拉取（活跃 1 分钟 / 闲置 10 分钟 / 深度闲置 15 分钟 / 夜间静默 30 分钟），只改变化的输入框
+   - 增量游标与云端密码哈希落本机：重开页面只拉「上次之后变化的格」，
+     不再每次全量分页拉；只有全新设备 / 清缓存 / 手动刷新才全量拉齐
+     （服务端单次最多 1000 行），拉齐前不推进游标、不回灌本机缺项状态
    - 本机 localStorage 继续做离线缓存；失败保留队列，联网自动补传
    - 客户端只初始化一次，配置一律来自本应用 publicConfig
    ============================================================ */
@@ -1931,11 +1931,12 @@ document.getElementById('xls-btn').addEventListener('click', function(){
   var ITEM_FIELDS = ['name','spec','baseVal','baseUnit','defVal','defUnit'];
 
   var PAGE = 1000, MAX_PAGES = 20;  /* 服务端单次查询上限 1000 行，按 1000 分页，减少请求次数 */
+  var SYNC_KEY = 'xunjia_sync_v1';  /* 增量游标 / 云端密码哈希落本机：重开不再全量拉 */
   var stateEl = document.getElementById('cloud-state');
   var cloud = null, ready = false, sheetCode = '', devId = '';
   var baseCells = {}, queue = {}, lastPull = null, initialized = false;
   var syncComplete = false, fullPullFail = 0;
-  var pollTimer = null, lastAct = Date.now();
+  var pollTimer = null, lastAct = Date.now(), resumePoll = null;
   var flushing = false, polling = false, flushTimer = null;
   var pushes = 0, pulls = 0, lastOk = '';
 
@@ -2005,6 +2006,33 @@ document.getElementById('xls-btn').addEventListener('click', function(){
      属于「防误操作」级别的锁：校验在前端，未解锁的设备只读不写。 */
   var cloudPass = '', unlocked = false, lockChecked = false;
   var UNLOCK_KEY = 'xunjia_unlock_v1';
+  function syncKey(){ return SYNC_KEY + ':' + sheetCode; }
+  function restoreSyncCache(){
+    try{
+      var d = JSON.parse(localStorage.getItem(syncKey()) || '{}');
+      if(d.lastPull) lastPull = d.lastPull;
+      if(d.cloudPass) cloudPass = d.cloudPass;
+    }catch(e){}
+  }
+  function saveSyncCache(){
+    try{ localStorage.setItem(syncKey(), JSON.stringify({lastPull:lastPull, cloudPass:cloudPass})); }catch(e){}
+  }
+  function clearSyncCursor(){
+    lastPull = null;
+    saveSyncCache();
+  }
+  /* 每天首次登录做一次全量校准：兜底极端时钟偏差（游标卡住）与增量遗漏。
+     一天一次，资源开销可忽略。 */
+  var FULL_DAY_KEY = 'xunjia_fullcal_day_v1';
+  function needDailyFull(){
+    var d = new Date();
+    var today = d.getFullYear() + '-' + ('0' + (d.getMonth()+1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
+    var last = null;
+    try{ last = localStorage.getItem(FULL_DAY_KEY + ':' + sheetCode); }catch(e){}
+    if(last === today) return false;
+    try{ localStorage.setItem(FULL_DAY_KEY + ':' + sheetCode, today); }catch(e){}
+    return true;
+  }
   var lockEl = document.getElementById('lock-screen');
   var lockPassEl = document.getElementById('lock-pass');
   var lockUserEl = document.getElementById('lock-user');
@@ -2112,8 +2140,13 @@ document.getElementById('xls-btn').addEventListener('click', function(){
   function refreshLock(){
     lockChecked = true;
     updatePassBtn();
-    if(readUnlock() === currentSecret()){ unlocked = true; hideLock(); return; }
+    if(readUnlock() === currentSecret()){
+      unlocked = true; hideLock();
+      if(resumePoll) resumePoll();
+      return;
+    }
     unlocked = false;
+    if(pollTimer){ clearTimeout(pollTimer); pollTimer = null; }   /* 未登录：停掉轮询 */
     showLock('这张询价单需要登录才能查看和修改。');
     if(lockErrEl) lockErrEl.textContent = '';
     setTimeout(function(){ if(lockPassEl) lockPassEl.focus(); }, 80);
@@ -2138,7 +2171,11 @@ document.getElementById('xls-btn').addEventListener('click', function(){
         if(lockErrEl) lockErrEl.textContent = '';
         hideLock();
         toast('登录成功', true);
-        poll(false);
+        markActive();
+        /* 登录后才拉一次：当天首次全量校准，其余走增量；随后恢复自适应轮询 */
+        var daily = needDailyFull();
+        if(daily) clearSyncCursor();
+        poll(daily).then(function(){ if(resumePoll) resumePoll(); });
       }else{
         if(lockErrEl) lockErrEl.textContent = '密码不对，请确认当前单据密码';
         if(lockPassEl && lockPassEl.select) lockPassEl.select();
@@ -2162,16 +2199,44 @@ document.getElementById('xls-btn').addEventListener('click', function(){
     if(cloudPassBtn) cloudPassBtn.textContent = '修改密码';
   }
   /* 退出登录：清掉本机登录状态，立即回到登录页；未登录时只读不写 */
-  function logout(){
+  function logout(tip){
     unlocked = false;
+    if(pollTimer){ clearTimeout(pollTimer); pollTimer = null; }   /* 退出后不再轮询云端 */
+    if(autoLogoutTimer){ clearTimeout(autoLogoutTimer); autoLogoutTimer = null; }
     try{ localStorage.removeItem(unlockKey()); }catch(e){}
     if(lockUserEl) lockUserEl.value = LOGIN_USER;
     if(lockPassEl) lockPassEl.value = '';
     if(lockErrEl) lockErrEl.textContent = '';
     closePassDialog();
-    showLock('已退出登录，请重新输入密码。');
+    showLock(tip || '已退出登录，请重新输入密码。');
+    setState('未登录 · 不自动同步', '');
     toast('已退出登录');
     setTimeout(function(){ if(lockPassEl) lockPassEl.focus(); }, 80);
+  }
+
+  /* ---- 超过 5 小时未在线自动退出：最后在线时间写本机，重开 / 切前台 / 联网都补检 ---- */
+  var IDLE_LOGOUT_MS = 5 * 60 * 60 * 1000;
+  var ACTIVE_KEY = 'xunjia_active_v1';
+  var autoLogoutTimer = null;
+  function activeKey(){ return ACTIVE_KEY + ':' + sheetCode; }
+  function markActive(){
+    var t = Date.now();
+    try{ localStorage.setItem(activeKey(), String(t)); }catch(e){}
+    if(autoLogoutTimer){ clearTimeout(autoLogoutTimer); autoLogoutTimer = null; }
+    if(unlocked) autoLogoutTimer = setTimeout(function(){ autoLogoutIfStale(); }, IDLE_LOGOUT_MS + 1000);
+  }
+  function autoLogoutIfStale(){
+    var last = 0;
+    try{ last = parseInt(localStorage.getItem(activeKey()) || '0', 10) || 0; }catch(e){}
+    if(last && Date.now() - last > IDLE_LOGOUT_MS){
+      if(autoLogoutTimer){ clearTimeout(autoLogoutTimer); autoLogoutTimer = null; }
+      if(unlocked || readUnlock()) logout('超过 5 小时未在线，已自动退出，请重新登录。');
+      markActive();   /* 重置计时，避免反复提示 */
+      return true;
+    }
+    if(unlocked && !autoLogoutTimer)
+      autoLogoutTimer = setTimeout(function(){ autoLogoutIfStale(); }, IDLE_LOGOUT_MS + 1000);
+    return false;
   }
   function openPassDialog(){
     if(!unlocked){ toast('先登录再改密码'); return; }
@@ -2194,6 +2259,7 @@ document.getElementById('xls-btn').addEventListener('click', function(){
     if(n1.length < 4){ if(passHintEl) passHintEl.textContent = '新密码至少 4 位'; return; }
     var v = await makePassHash(n1);
     cloudPass = v;
+    saveSyncCache();
     unlocked = true;
     writeUnlock(v);
     queue['meta|password'] = {v:v, t:nowISO()};
@@ -2411,18 +2477,22 @@ document.getElementById('xls-btn').addEventListener('click', function(){
       baseCells[k] = {v:v, t:r.updated_at || b && b.t || nowISO()};
     });
     if(passMoved) refreshLock();                /* 别人改了密码：本机重新判定 */
+    /* 增量拉到的值必须落本机缓存：程序化改 input 不触发 input/change，
+       若不在这里保存，游标前进后本机将一直是旧值。localSave 只写本地、不回推云端。 */
+    if(changed) localSave();
     return changed;
   }
 
-  /* ---- 每 3 秒拉增量；首次 / 手动刷新分页拉全量 ---- */
+  /* ---- 增量拉取；首次 / 手动刷新分页拉全量 ---- */
   async function poll(manual){
-    if(!ready || polling) return;
+    /* 未登录不访问云端（启动首次探测云端密码除外）；退出登录后彻底停更 */
+    if(!ready || polling || (!unlocked && lockChecked)) return;
     if(typeof clearing !== 'undefined' && clearing) return;   /* 清空中：暂停拉取，避免把旧数据拉回 */
     polling = true;
     var first = !syncComplete;
     try{
-      /* 首次必须全量；手动刷新也全量（可补齐历史遗漏）；否则按游标拉增量 */
-      var since = (first || manual || !lastPull) ? null : lastPull;
+      /* 手动刷新 / 本机没有游标才全量；否则按上次游标拉增量（重开页面不再全量） */
+      var since = (manual || !lastPull) ? null : lastPull;
       var res = await fetchRows(since);
 
       /* 没拉齐就绝不推进游标、绝不显示已同步、绝不回灌本机状态，下一轮继续重拉 */
@@ -2436,7 +2506,13 @@ document.getElementById('xls-btn').addEventListener('click', function(){
 
       var chk = since ? null : checkCompleteness(res.rows);
       if(res.rows.length) applyRows(res.rows);
-      if(res.maxTs && (!lastPull || new Date(res.maxTs) > new Date(lastPull))) lastPull = res.maxTs;
+      /* 游标回退 2 分钟推进：容忍设备间时钟偏差。
+         若某台设备时钟偏快写入了未来时间戳，游标不会卡死在未来，
+         校时后其它设备写入的数据仍能被增量拉取（代价是每次多读几行，通常 0）。 */
+      if(res.maxTs && (!lastPull || new Date(res.maxTs) > new Date(lastPull))){
+        lastPull = new Date(new Date(res.maxTs).getTime() - 120000).toISOString();
+      }
+      saveSyncCache();                                 /* 游标 / 密码哈希落本机，下次重开走增量 */
       pulls++;
       lastOk = '已同步 · ' + hhmm();
 
@@ -2445,8 +2521,11 @@ document.getElementById('xls-btn').addEventListener('click', function(){
         initialized = true;
         fullPullFail = 0;
         refreshLock();                                 /* 先判定锁状态，未解锁不推数据 */
-        if(!res.rows.length){ if(unlocked) enqueue(diffCells()); }   /* 云端空房间：本机数据作基线 */
-        else if(unlocked) enqueue(localOnlyCells());                  /* 云端已有数据：只补本机独有，不推空 */
+        /* 只在全量拉取时判定「云端空房间」；增量拉取 0 行是正常情况，不能把本机旧数据推上去 */
+        if(!since && unlocked){
+          if(!res.rows.length) enqueue(diffCells());    /* 云端空房间：本机数据作基线 */
+          else enqueue(localOnlyCells());               /* 云端已有数据：只补本机独有，不推空 */
+        }
         setState(chk && chk.missing.length
           ? '已同步 · 云端有 ' + chk.missing.length + ' 个空品名'
           : lastOk, chk && chk.missing.length ? 'warn' : 'ok');
@@ -2482,7 +2561,7 @@ document.getElementById('xls-btn').addEventListener('click', function(){
       baseCells = {};               /* 重置基线：把「品名保留、金额清空」的整表重新推上去 */
       initialized = true;
       syncComplete = true;
-      lastPull = null;
+      clearSyncCursor();
       if(!ready){ clearing = false; return; }
       try{
         var d = await cloud.database.from(CELL_TABLE).delete().eq('room', sheetCode);
@@ -2529,12 +2608,15 @@ document.getElementById('xls-btn').addEventListener('click', function(){
   var bCopy = document.getElementById('cloud-copy');
   if(bCopy) bCopy.addEventListener('click', copyShared);
   var bRefresh = document.getElementById('cloud-refresh');
-  if(bRefresh) bRefresh.addEventListener('click', function(){ lastPull = null; poll(true); });
+  if(bRefresh) bRefresh.addEventListener('click', function(){ clearSyncCursor(); poll(true); });
 
   /* ---- 启动 ---- */
   function boot(){
     initDev();
     initCode();
+    restoreSyncCache();   /* 恢复增量游标与云端密码哈希：重开页面不再全量拉 */
+    autoLogoutIfStale();   /* 设备睡过 / 关过页面：超过 5 小时未在线先退出 */
+    markActive();
     /* 本机没登录过就先显示登录页，等首次同步确认账号密码 */
     if(!readUnlock()) showLock('这张询价单需要登录才能查看和修改。');
     /* 兜底：一直拉不到云端时，已登录过的本机仍可用；没登录过则保持登录页（不能绕过登录） */
@@ -2564,24 +2646,39 @@ document.getElementById('xls-btn').addEventListener('click', function(){
       return;
     }
     ready = true;
-    poll(true);
-    /* 自适应轮询：刚操作过 10 秒一次，闲置 1 分钟后降到 30 秒一次；
-       页面切到后台 / 手机锁屏时完全停掉，回来后立刻补拉一次。
-       这样既保留「几秒内互见」，又把空闲时的云请求量降一个数量级。 */
+    resumePoll = schedulePoll;   /* 暴露给模块作用域：登录成功后恢复轮询 */
+    poll(false).then(function(){ schedulePoll(); });   /* 有游标就增量，重开不再全量 */
+    /* 自适应轮询（省资源优先）：
+       - 刚操作过 1 分钟一次；
+       - 闲置 1 分钟后 10 分钟一次，闲置超 10 分钟再降到 15 分钟一次；
+       - 夜间 20:00~次日 7:00 且闲置超 5 分钟 → 完全静默（0 请求，每 30 分钟醒一次），
+         夜间有人操作则照常同步；
+       - 页面切到后台 / 手机锁屏时完全停掉，回来后立刻补拉一次。 */
+    function isNight(){
+      var h = new Date().getHours();
+      return h >= 20 || h < 7;
+    }
     pollTimer = null;
     lastAct = Date.now();
     ['pointerdown','keydown','input','touchstart'].forEach(function(ev){
-      document.addEventListener(ev, function(){ lastAct = Date.now(); }, { passive: true });
+      document.addEventListener(ev, function(){ lastAct = Date.now(); markActive(); }, { passive: true });
     });
     function schedulePoll(){
       if(pollTimer){ clearTimeout(pollTimer); pollTimer = null; }
-      if(document.hidden) return;
-      var idle = Date.now() - lastAct > 60000;
-      var delay = idle ? 30000 : 10000;   /* 操作中 10 秒一次，闲置 1 分钟后 30 秒一次 */
+      if(!unlocked || document.hidden) return;   /* 未登录 / 后台：不更新 */
+      var gap = Date.now() - lastAct;
+      var silent = isNight() && gap > 300000;                    /* 夜间静默：20 点后没人用就不拉 */
+      var delay = silent ? 1800000                              /* 夜间静默：30 分钟醒一次 */
+                : gap > 600000 ? 900000                          /* 白天闲置超 10 分钟：15 分钟一次 */
+                : gap > 60000 ? 600000                           /* 闲置 1 分钟后：10 分钟一次 */
+                : 60000;                                          /* 操作中：1 分钟一次 */
       pollTimer = setTimeout(function(){
         pollTimer = null;
-        poll(false);
-        if(Object.keys(queue).length) flush(false);
+        if(autoLogoutIfStale()) return;   /* 超过 5 小时未在线：退出并停更 */
+        if(!(isNight() && Date.now() - lastAct > 300000)){
+          poll(false);
+          if(Object.keys(queue).length) flush(false);            /* 有没传完的改动仍要补传 */
+        }
         schedulePoll();
       }, delay);
     }
@@ -2590,10 +2687,11 @@ document.getElementById('xls-btn').addEventListener('click', function(){
       if(document.hidden){
         if(pollTimer){ clearTimeout(pollTimer); pollTimer = null; }
       }else{
+        if(!autoLogoutIfStale()) markActive();
         poll(false); flush(false); schedulePoll();
       }
     });
-    window.addEventListener('online', function(){ poll(false); flush(false); });
+    window.addEventListener('online', function(){ if(!autoLogoutIfStale()) markActive(); poll(false); flush(false); schedulePoll(); });
   }
 
   /* 自检接口：供联调 / 验收脚本确认云端真的通了 */
@@ -2611,7 +2709,7 @@ document.getElementById('xls-btn').addEventListener('click', function(){
       };
     },
     push: function(){ enqueue(diffCells()); return flush(true); },
-    pull: function(){ lastPull = null; return poll(true); },
+    pull: function(){ clearSyncCursor(); return poll(true); },
     clientReady: function(){ return !!(cloud && cloud.database); },
     client: function(){ return cloud; },
     cells: function(){ return baseCells; }
